@@ -29,6 +29,7 @@ export default class VueRouter {
   matcher: Matcher;
   fallback: boolean;
   beforeHooks: Array<?NavigationGuard>;
+  beforeQueueHooks: Array<?NavigationGuard>;
   resolveHooks: Array<?NavigationGuard>;
   afterHooks: Array<?AfterNavigationHook>;
 
@@ -37,6 +38,7 @@ export default class VueRouter {
     this.apps = []
     this.options = options
     this.beforeHooks = []
+    this.beforeQueueHooks = []
     this.resolveHooks = []
     this.afterHooks = []
     this.matcher = createMatcher(options.routes || [], this)
@@ -120,6 +122,10 @@ export default class VueRouter {
 
   beforeEach (fn: Function): Function {
     return registerHook(this.beforeHooks, fn)
+  }
+
+  beforeQueue (fn: Function): Function {
+    return registerHook(this.beforeQueue, fn)
   }
 
   beforeResolve (fn: Function): Function {

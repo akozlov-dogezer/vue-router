@@ -1952,7 +1952,8 @@ History.prototype.confirmTransition = function confirmTransition (route, onCompl
     // in-config enter guards
     activated.map(function (m) { return m.beforeEnter; }),
     // async components
-    resolveAsyncComponents(activated)
+    resolveAsyncComponents(activated),
+    this.router.beforeQueue
   );
 
   this.pending = route;
@@ -2449,6 +2450,7 @@ var VueRouter = function VueRouter (options) {
   this.apps = [];
   this.options = options;
   this.beforeHooks = [];
+  this.beforeQueueHooks = [];
   this.resolveHooks = [];
   this.afterHooks = [];
   this.matcher = createMatcher(options.routes || [], this);
@@ -2536,6 +2538,10 @@ VueRouter.prototype.init = function init (app /* Vue component instance */) {
 
 VueRouter.prototype.beforeEach = function beforeEach (fn) {
   return registerHook(this.beforeHooks, fn)
+};
+
+VueRouter.prototype.beforeQueue = function beforeQueue (fn) {
+  return registerHook(this.beforeQueue, fn)
 };
 
 VueRouter.prototype.beforeResolve = function beforeResolve (fn) {

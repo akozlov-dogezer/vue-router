@@ -125,7 +125,8 @@ export class History {
       // in-config enter guards
       activated.map(m => m.beforeEnter),
       // async components
-      resolveAsyncComponents(activated)
+      resolveAsyncComponents(activated),
+      this.router.beforeQueue
     )
 
     this.pending = route
