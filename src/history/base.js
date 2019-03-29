@@ -126,7 +126,7 @@ export class History {
       activated.map(m => m.beforeEnter),
       // async components
       resolveAsyncComponents(activated),
-      this.router.beforeQueue
+      this.router.beforeQueueHooks
     )
 
     this.pending = route

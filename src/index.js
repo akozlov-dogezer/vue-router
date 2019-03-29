@@ -125,7 +125,7 @@ export default class VueRouter {
   }
 
   beforeQueue (fn: Function): Function {
-    return registerHook(this.beforeQueue, fn)
+    return registerHook(this.beforeQueueHooks, fn)
   }
 
   beforeResolve (fn: Function): Function {
