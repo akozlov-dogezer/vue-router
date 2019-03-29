@@ -2626,7 +2626,7 @@ VueRouter.prototype.resolve = function resolve (
   }
 };
 
-VueRouter.prototype.addRoutes = function addRoutes (routes) {
+VueRouter.prototype.addRoutes = function addRoutes (routes, doTransition) {
   this.matcher.addRoutes(routes);
   if (this.history.current !== START) {
     this.history.transitionTo(this.history.getCurrentLocation());
@@ -2634,7 +2634,7 @@ VueRouter.prototype.addRoutes = function addRoutes (routes) {
 };
 VueRouter.prototype.replaceRoutes = function replaceRoutes (routes) {
   this.matcher.removeRoutes();
-  this.addRoutes(routes);
+  this.addRoutes(routes, false);
 };
 
 Object.defineProperties( VueRouter.prototype, prototypeAccessors );

@@ -213,7 +213,7 @@ export default class VueRouter {
     }
   }
 
-  addRoutes (routes: Array<RouteConfig>) {
+  addRoutes (routes: Array<RouteConfig>, doTransition: boolean) {
     this.matcher.addRoutes(routes)
     if (this.history.current !== START) {
       this.history.transitionTo(this.history.getCurrentLocation())
@@ -221,7 +221,7 @@ export default class VueRouter {
   }
   replaceRoutes (routes: Array<RouteConfig>) {
     this.matcher.removeRoutes()
-    this.addRoutes(routes)
+    this.addRoutes(routes, false)
   }
 }
 
