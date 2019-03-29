@@ -100,7 +100,10 @@ export class History {
     if (
       isSameRoute(route, current) &&
       // in the case the route map has been dynamically appended to
-      route.matched.length === current.matched.length
+      route.matched.length === current.matched.length &&
+      !route.matched.find((matched, index) => {
+        return matched.components !== current.matched[index].components
+      })
     ) {
       this.ensureURL()
       return abort()

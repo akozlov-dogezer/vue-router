@@ -1,6 +1,6 @@
 /*!
   * vue-router v3.0.2
-  * (c) 2018 Evan You
+  * (c) 2019 Evan You
   * @license MIT
   */
 'use strict';
@@ -117,6 +117,10 @@ var View = {
         }
       }
     }
+    if (!data.hasOwnProperty('props') || !data.props) {
+      data.props = {};
+    }
+    data.props.depth = depth;
 
     return h(component, data, children)
   }
@@ -259,6 +263,8 @@ function createRoute (
   var route = {
     name: location.name || (record && record.name),
     meta: (record && record.meta) || {},
+    children: (record && record.children) || [],
+    parent: (record && record.parent),
     path: location.path || '/',
     hash: location.hash || '',
     query: query,
@@ -1084,16 +1090,24 @@ function fillParams (
   params,
   routeMsg
 ) {
+  params = params || {};
   try {
     var filler =
       regexpCompileCache[path] ||
       (regexpCompileCache[path] = pathToRegexp_1.compile(path));
-    return filler(params || {}, { pretty: true })
+
+    // Fix #2505 resolving asterisk routes { name: 'not-found', params: { pathMatch: '/not-found' }}
+    if (params.pathMatch) { params[0] = params.pathMatch; }
+
+    return filler(params, { pretty: true })
   } catch (e) {
     if (process.env.NODE_ENV !== 'production') {
       warn(false, ("missing param for " + routeMsg + ": " + (e.message)));
     }
     return ''
+  } finally {
+    // delete the 0 if it was added
+    delete params[0];
   }
 }
 
@@ -1167,6 +1181,7 @@ function addRouteRecord (
     regex: compileRouteRegex(normalizedPath, pathToRegexpOptions),
     components: route.components || { default: route.component },
     instances: {},
+    children: route.children || [],
     name: name,
     parent: parent,
     matchAs: matchAs,
@@ -1272,8 +1287,10 @@ function normalizeLocation (
 ) {
   var next = typeof raw === 'string' ? { path: raw } : raw;
   // named target
-  if (next.name || next._normalized) {
+  if (next._normalized) {
     return next
+  } else if (next.name) {
+    return extend({}, raw)
   }
 
   // relative params
@@ -1333,6 +1350,12 @@ function createMatcher (
 
   function addRoutes (routes) {
     createRouteMap(routes, pathList, pathMap, nameMap);
+  }
+
+  function removeRoutes () {
+    pathList.splice(0, pathList.length);
+    Object.keys(pathMap).forEach(function (key) { return (delete pathMap[key]); });
+    Object.keys(nameMap).forEach(function (key) { return (delete nameMap[key]); });
   }
 
   function match (
@@ -1483,7 +1506,8 @@ function createMatcher (
 
   return {
     match: match,
-    addRoutes: addRoutes
+    addRoutes: addRoutes,
+    removeRoutes: removeRoutes
   }
 }
 
@@ -1904,7 +1928,10 @@ History.prototype.confirmTransition = function confirmTransition (route, onCompl
   if (
     isSameRoute(route, current) &&
     // in the case the route map has been dynamically appended to
-    route.matched.length === current.matched.length
+    route.matched.length === current.matched.length &&
+    !route.matched.find(function (matched, index) {
+      return matched.components !== current.matched[index].components
+    })
   ) {
     this.ensureURL();
     return abort()
@@ -2130,7 +2157,7 @@ function poll (
 
 /*  */
 
-var HTML5History = (function (History$$1) {
+var HTML5History = /*@__PURE__*/(function (History$$1) {
   function HTML5History (router, base) {
     var this$1 = this;
 
@@ -2218,7 +2245,7 @@ function getLocation (base) {
 
 /*  */
 
-var HashHistory = (function (History$$1) {
+var HashHistory = /*@__PURE__*/(function (History$$1) {
   function HashHistory (router, base, fallback) {
     History$$1.call(this, router, base);
     // check history fallback deeplinking
@@ -2355,7 +2382,7 @@ function replaceHash (path) {
 
 /*  */
 
-var AbstractHistory = (function (History$$1) {
+var AbstractHistory = /*@__PURE__*/(function (History$$1) {
   function AbstractHistory (router, base) {
     History$$1.call(this, router, base);
     this.stack = [];
@@ -2568,9 +2595,10 @@ VueRouter.prototype.resolve = function resolve (
   current,
   append
 ) {
+  current = current || this.history.current;
   var location = normalizeLocation(
     to,
-    current || this.history.current,
+    current,
     append,
     this
   );
@@ -2593,6 +2621,10 @@ VueRouter.prototype.addRoutes = function addRoutes (routes) {
   if (this.history.current !== START) {
     this.history.transitionTo(this.history.getCurrentLocation());
   }
+};
+VueRouter.prototype.replaceRoutes = function replaceRoutes (routes) {
+  this.matcher.removeRoutes();
+  this.addRoutes(routes);
 };
 
 Object.defineProperties( VueRouter.prototype, prototypeAccessors );

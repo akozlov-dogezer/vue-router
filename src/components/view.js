@@ -83,6 +83,10 @@ export default {
         }
       }
     }
+    if (!data.hasOwnProperty('props') || !data.props) {
+      data.props = {}
+    }
+    data.props.depth = depth
 
     return h(component, data, children)
   }

@@ -100,4 +100,6 @@ declare type Route = {
   matched: Array<RouteRecord>;
   redirectedFrom?: string;
   meta?: any;
+  parent: ?RouteRecord;
+  children: Array<RouteConfig>;
 }
