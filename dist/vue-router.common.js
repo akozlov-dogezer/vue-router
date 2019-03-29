@@ -2628,9 +2628,9 @@ VueRouter.prototype.addRoutes = function addRoutes (routes, doTransition) {
     this.history.transitionTo(this.history.getCurrentLocation());
   }
 };
-VueRouter.prototype.replaceRoutes = function replaceRoutes (routes) {
+VueRouter.prototype.replaceRoutes = function replaceRoutes (routes, doTransition) {
   this.matcher.removeRoutes();
-  this.addRoutes(routes, false);
+  this.addRoutes(routes, doTransition);
 };
 
 Object.defineProperties( VueRouter.prototype, prototypeAccessors );
