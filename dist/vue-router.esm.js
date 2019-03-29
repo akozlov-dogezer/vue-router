@@ -2622,7 +2622,7 @@ VueRouter.prototype.resolve = function resolve (
 
 VueRouter.prototype.addRoutes = function addRoutes (routes, doTransition) {
   this.matcher.addRoutes(routes);
-  if (this.history.current !== START) {
+  if ((this.history.current !== START) && (doTransition)) {
     this.history.transitionTo(this.history.getCurrentLocation());
   }
 };
