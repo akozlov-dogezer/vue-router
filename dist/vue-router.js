@@ -1953,11 +1953,12 @@ History.prototype.confirmTransition = function confirmTransition (route, onCompl
     this.router.beforeHooks,
     // in-component update hooks
     extractUpdateHooks(updated),
+    this.router.beforeQueueHooks,
     // in-config enter guards
     activated.map(function (m) { return m.beforeEnter; }),
     // async components
-    resolveAsyncComponents(activated),
-    this.router.beforeQueueHooks
+    resolveAsyncComponents(activated)
+
   );
 
   this.pending = route;
